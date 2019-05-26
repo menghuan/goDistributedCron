@@ -1,9 +1,9 @@
 package common
 
 const (
-	//任务保存目录
-	JOB_SAVE_DIR = "/cron/jobs/"
+	//etcd任务保存目录
+	ETCD_JOB_SAVE_DIR = "/distributed_cron/jobs/"
 
-	//任务杀死目录
-	JOB_KILLER_DIR = "/cron/killer/"
+	//etcd任务杀死目录
+	ETCD_JOB_KILLER_DIR = "/distributed_cron/killers/"
 )

@@ -2,7 +2,7 @@ package master
 
 import (
 	"encoding/json"
-	"go-cron-study/common"
+	"goDistributedCron/common"
 	"net"
 	"net/http"
 	"strconv"

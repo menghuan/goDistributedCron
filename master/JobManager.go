@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/mvcc/mvccpb"
-	"go-cron-study/common"
+	"goDistributedCron/common"
 	"time"
 )
 
@@ -17,7 +17,7 @@ type JobManager struct {
 }
 
 var (
-	//单例对象
+	//任务管理器单例对象
 	G_jobMgr *JobManager
 )
 
@@ -66,7 +66,7 @@ func(jobMgr *JobManager) SaveJob(job *common.Job) (oldJob *common.Job, err error
 	)
 
 	//etcd 保存任务的key
-	jobKey = common.JOB_SAVE_DIR + job.Name
+	jobKey = common.ETCD_JOB_SAVE_DIR + job.Name
 	//任务信息json
 	if jobValue, err = json.Marshal(job); err != nil {
 		return
@@ -92,12 +92,12 @@ func(jobMgr *JobManager) SaveJob(job *common.Job) (oldJob *common.Job, err error
 //删除任务
 func (jobMgr *JobManager) DeleteJob(name string) (oldJob *common.Job, err error)  {
 	var (
-		jobKey string
-		delResp *clientv3.DeleteResponse
+		jobKey    string
+		delResp   *clientv3.DeleteResponse
 		oldJobObj common.Job
 	)
 	//保存在etcd的任务key
-	jobKey = common.JOB_SAVE_DIR + name
+	jobKey = common.ETCD_JOB_SAVE_DIR + name
 
 	//从etcd中删除key
 	if delResp, err = jobMgr.kv.Delete(context.TODO(), jobKey, clientv3.WithPrevKV()); err != nil {
@@ -119,13 +119,13 @@ func (jobMgr *JobManager) DeleteJob(name string) (oldJob *common.Job, err error)
 //获取任务列表
 func (jobMgr *JobManager) ListJobs() (jobList []*common.Job, err error)  {
 	var (
-		jobDirKey string
-		getResp *clientv3.GetResponse
-		kvPair *mvccpb.KeyValue
-		job *common.Job
+		jobDirKey   string
+		getResp 	*clientv3.GetResponse
+		kvPair 		*mvccpb.KeyValue
+		job 		*common.Job
 	)
 	//保存在etcd任务的目录
-	jobDirKey = common.JOB_SAVE_DIR
+	jobDirKey = common.ETCD_JOB_SAVE_DIR
 	//获取目录下的所有任务
 	if getResp, err = jobMgr.kv.Get(context.TODO(), jobDirKey, clientv3.WithPrefix()); err != nil {
 		return
@@ -157,7 +157,7 @@ func (jobMgr *JobManager) KillJob(name string) (err error)  {
 	)
 
 	//通知worker杀死对应任务
-	jobKillerKey = common.JOB_KILLER_DIR + name
+	jobKillerKey = common.ETCD_JOB_KILLER_DIR + name
 	//让woker监听到一次put操作即可，创建一个租约让其稍后自动过期即可
 	if leaseGrantResp, err = jobMgr.lease.Grant(context.TODO(), 1); err != nil {
 		return

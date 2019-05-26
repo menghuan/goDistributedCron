@@ -3,19 +3,19 @@ package main
 import (
 	"flag"
 	"fmt"
-	"go-cron-study/master"
+	"goDistributedCron/master"
 	"runtime"
 	"time"
 )
 var (
 	//配置文件路径
-	confFile string
+	configFilePath string
 )
 //解析命令行参数
 func initArgs()  {
 	//通过flag库来解析命令行参数 master -config ./master.json  xxx 123 -yyy ddd
 	//master -h 查看帮助
-	flag.StringVar(&confFile, "config", "./master.json", "指定master.json")
+	flag.StringVar(&configFilePath, "config", "./master.json", "指定master.json")
 	//解析参数
 	flag.Parse()
 }
@@ -37,7 +37,7 @@ func main() {
 	initEnv()
 
 	//加载配置文件 通过传递文件名 进行读取 反序列化解析
-	if err = master.InitConfig(confFile); err != nil {
+	if err = master.InitConfig(configFilePath); err != nil {
 		goto ERR
 	}
 
@@ -59,5 +59,5 @@ func main() {
 	return
 
 ERR:
-		fmt.Println(err)
+	fmt.Println(err)
 }

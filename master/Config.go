@@ -8,19 +8,19 @@ import (
 //config配置文件结构
 type Config struct {
 	//api端口
-	ApiPort int `json:"apiPort"`
+	ApiPort          int `json:"apiPort"`
 	//api读超时
-	ApiReadTimeout int `json:"apiReadTimeout"`
+	ApiReadTimeout   int `json:"apiReadTimeout"`
 	//api写超时
-	ApiWiterTimeout int `json:"apiWriteTimeout"`
+	ApiWiterTimeout  int `json:"apiWriteTimeout"`
 	//etcd 集群地址
-	EtcdEndpoints []string `json:"etcdEndpoints"`
+	EtcdEndpoints    []string `json:"etcdEndpoints"`
 	//etcd超时
-	EtcdDialTimeout int `json:"etcdDialTimeout"`
+	EtcdDialTimeout  int `json:"etcdDialTimeout"`
 }
 
 var (
-	//单例对象
+	//配置文件单例对象
 	G_config *Config
 )
 
@@ -28,7 +28,7 @@ var (
 func InitConfig(filename string) (err error)  {
 	var (
 		content []byte
-		conf Config
+		conf    Config
 	)
 
 	//1.读取配置文件
@@ -41,7 +41,7 @@ func InitConfig(filename string) (err error)  {
 		return
 	}
 
-	//3. 赋值单例
+	//3. 赋值单例对象
 	G_config = &conf
 
 	return
