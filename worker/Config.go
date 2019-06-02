@@ -1,4 +1,4 @@
-package master
+package worker
 
 import (
 	"encoding/json"
@@ -7,18 +7,10 @@ import (
 
 //config配置文件结构
 type Config struct {
-	//api端口
-	ApiPort          int `json:"apiPort"`
-	//api读超时
-	ApiReadTimeout   int `json:"apiReadTimeout"`
-	//api写超时
-	ApiWriteTimeout  int `json:"apiWriteTimeout"`
 	//etcd 集群地址
 	EtcdEndpoints    []string `json:"etcdEndpoints"`
 	//etcd超时
 	EtcdDialTimeout  int `json:"etcdDialTimeout"`
-	//静态页面根目录
-	StaticWebRoot    string `json:"static_web_root"`
 }
 
 var (

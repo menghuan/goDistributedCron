@@ -2,6 +2,7 @@ package master
 
 import (
 	"encoding/json"
+	"fmt"
 	"goDistributedCron/common"
 	"net"
 	"net/http"
@@ -43,14 +44,19 @@ func handleJobSave(resp http.ResponseWriter, req *http.Request) {
    if oldJob,err = G_jobMgr.SaveJob(&job); err != nil {
    	    goto ERR
    }
+
    //5. 返回正常应答 ({"errno":0,"msg":"", "data":{....}})
    if bytes, err = common.BuildResponse(0, "success", oldJob); err == nil {
-   	   resp.Write(bytes)
+	   //bytes是[]byte类型，转化成string类型便于查看
+	   fmt.Println(string(bytes))
+	   resp.Write(bytes)
    }
    return
 ERR:
 	//6. 返回异常应答
 	if bytes, err = common.BuildResponse(-1, err.Error(), nil); err == nil {
+		//bytes是[]byte类型，转化成string类型便于查看
+		fmt.Println(string(bytes))
 		resp.Write(bytes)
 	}
 }
@@ -149,6 +155,8 @@ func InitApiServer() (err error) {
 		mux           *http.ServeMux
 		listener      net.Listener
 		httpServer    *http.Server
+		staticDir     http.Dir     //静态文件根目录
+		staticHandler http.Handler //静态文件的HTTP回调
 	)
 	//配置路由
 	mux = http.NewServeMux()
@@ -161,6 +169,13 @@ func InitApiServer() (err error) {
 	//杀死任务
 	mux.HandleFunc("/job/kill", handleJobKill)
 
+	//静态文件目录
+	staticDir = http.Dir(G_config.StaticWebRoot)
+	//静态文件handler
+	staticHandler = http.FileServer(staticDir)
+	// /index.html   ./static_webroot/index.html
+	mux.Handle("/", http.StripPrefix("/", staticHandler))
+
 
 	//启动TCP监听 此处err不定义局部变量 直接返回值返回
 	if listener, err = net.Listen("tcp", ":" + strconv.Itoa(G_config.ApiPort)); err != nil {
@@ -170,7 +185,7 @@ func InitApiServer() (err error) {
 	//创建一个http服务
 	httpServer = &http.Server{
 		ReadTimeout: time.Duration(G_config.ApiReadTimeout),
-		WriteTimeout:time.Duration(G_config.ApiWiterTimeout),
+		WriteTimeout:time.Duration(G_config.ApiWriteTimeout),
 		Handler:mux,
 	}
 
