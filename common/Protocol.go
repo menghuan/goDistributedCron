@@ -83,6 +83,16 @@ type JobExecuteLogBatch struct {
 	Logs []interface{}
 }
 
+// 任务日志过滤条件
+type JobExecuteLogFilter struct {
+	JobName string `bson:"jobName"`
+}
+
+// 任务日志排序规则
+type SortJobExecuteLogByStartTime struct {
+	SortOrder int `bson:"startTime"`	// {startTime: -1}
+}
+
 
 //etcd变化事件
 type JobEvent struct {
@@ -183,4 +193,9 @@ func BuildJobExcutingPlan(jobSchedulerPlan *JobSchedulerPlan) (jobExecutingPlan 
 	//获取执行任务的上下文和取消函数
 	jobExecutingPlan.CancleCtx, jobExecutingPlan.CancleFunc = context.WithCancel(context.TODO())
 	return
+}
+
+// 提取worker的IP
+func ExtractWorkerIP(regKey string) (string) {
+	return strings.TrimPrefix(regKey, ETCD_JOB_WORKER_DIR)
 }

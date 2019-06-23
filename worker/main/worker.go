@@ -41,6 +41,11 @@ func main() {
 		goto ERR
 	}
 
+	//启动服务注册发现管理器
+	if err = worker.InitJobRegister(); err != nil {
+		goto ERR
+	}
+
 	//启动日志协程
 	if err = worker.InitJobLogStorager(); err != nil {
 		goto ERR

@@ -10,6 +10,9 @@ const (
 	//etcd任务锁目录
 	ETCD_JOB_LOCK_DIR = "/distributed_cron/locks/"
 
+	// 服务注册目录
+	ETCD_JOB_WORKER_DIR = "/distributed_cron/workers/"
+
 	//保存更新任务事件
 	ETCD_JOB_EVENT_SAVE = 1
 
