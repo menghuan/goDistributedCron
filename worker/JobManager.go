@@ -59,6 +59,9 @@ func InitJobManager() (err error){
 	//启动任务监听
 	G_jobMgr.watchJob()
 
+	//启动任务监听强杀
+	G_jobMgr.watchJobKiller()
+
 	return
 }
 
@@ -76,7 +79,7 @@ func(jobMgr *JobManager) watchJob() (err error){
 		jobEvent            *common.JobEvent
 	)
 
-	//1.获取一下etcd中/cron/jobs目录下的所有任务，并且获知当前集群的revision
+	//1.获取一下etcd中/distributed_cron/jobs目录下的所有任务，并且获知当前集群的revision
 	if getResp,err = jobMgr.kv.Get(context.TODO(), common.ETCD_JOB_SAVE_DIR, clientv3.WithPrefix()); err != nil {
 		return
 	}
@@ -93,7 +96,7 @@ func(jobMgr *JobManager) watchJob() (err error){
 	go func() { //启动监听协程
 	   //从Get时刻的后续版本开始监听
 	   watchStartRevision = getResp.Header.Revision + 1
-	   //监听/cron/jobs/目录的后续变化 需要版本和withPrefix
+	   //监听/distributed_cron/jobs/目录的后续变化 需要版本和withPrefix
 	   watchChan = jobMgr.watcher.Watch(context.TODO(), common.ETCD_JOB_SAVE_DIR, clientv3.WithRev(watchStartRevision), clientv3.WithPrefix())
 	   //处理监听事件
 	   for watchResp = range watchChan {
@@ -107,7 +110,7 @@ func(jobMgr *JobManager) watchJob() (err error){
 				   //构建一个更新event事件
 				   jobEvent = common.BuildJobEvent(common.ETCD_JOB_EVENT_SAVE, job)
 			   case mvccpb.DELETE: //任务删除事件
-				   //Delete /cron/jobs/jobxx
+				   //Delete /distributed_cron/jobs/jobxx
 				   jobName = common.ExtractJobName(string(watchEvent.Kv.Value))
 				   //通过job集合中获取job任务
 				   job = &common.Job{Name:jobName}
@@ -120,5 +123,49 @@ func(jobMgr *JobManager) watchJob() (err error){
 	   }
 	}()
 
+	return
+}
+
+
+//监听etcd强杀任务通知
+func(jobMgr *JobManager) watchJobKiller() (err error){
+	var (
+		watchChan           clientv3.WatchChan //底层是channel
+		watchResp           clientv3.WatchResponse
+		watchEvent          *clientv3.Event
+		jobName				string
+		jobEvent            *common.JobEvent
+		job					*common.Job
+	)
+
+	//监听/distributed_cron/killers目录
+	go func() { //启动监听协程
+		//监听/distributed_cron/killers/目录的后续变化 需要版本和withPrefix
+		watchChan = jobMgr.watcher.Watch(context.TODO(), common.ETCD_JOB_KILLER_DIR, clientv3.WithPrefix())
+		//处理监听事件
+		for watchResp = range watchChan {
+			for _, watchEvent = range watchResp.Events{
+				switch watchEvent.Type {
+				case mvccpb.PUT:  //杀死强杀任务
+					jobName = common.ExtractKillerJobName(string(watchEvent.Kv.Key))
+					//任务名称
+					job = &common.Job{Name:jobName}
+					jobEvent = common.BuildJobEvent(common.ETCD_JOB_EVENT_KILL, job)
+					//TODO:推送事件给scheduler调度协程
+					G_scheduler.pushJobEvent(jobEvent)
+				case mvccpb.DELETE: //killers标记过期，被自动删除
+				}
+			}
+		}
+	}()
+
+	return
+}
+
+
+//创建任务执行分布式锁
+func (jobMgr *JobManager) CreateJobDistributedLock(jobName string) (jobDistributedLock *JobDistributedLock)  {
+	//返回锁
+	jobDistributedLock = InitJobDistributedLock(jobName, jobMgr.kv, jobMgr.lease)
 	return
 }

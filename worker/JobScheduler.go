@@ -26,9 +26,11 @@ var (
 //处理任务事件
 func (scheduler *JobScheduler) HandleJobEvent(jobEvent *common.JobEvent)  {
 	var (
-		jobSchedulerPlan   *common.JobSchedulerPlan
-		jobExisted         bool
-		err				   error
+		jobSchedulerPlan   		*common.JobSchedulerPlan
+		jobExisted         		bool
+		jobExecutePlanInfo 		*common.JobExecutingPlan
+		jobExecuting			bool
+		err				   		error
 	)
 	switch jobEvent.EventType {
 	//保存修改任务事件
@@ -45,13 +47,46 @@ func (scheduler *JobScheduler) HandleJobEvent(jobEvent *common.JobEvent)  {
 		if jobSchedulerPlan, jobExisted = scheduler.jobPlanTableMap[jobEvent.Job.Name]; jobExisted {
 			delete(scheduler.jobPlanTableMap, jobEvent.Job.Name)
 		}
+	//强杀任务事件	
+	case common.ETCD_JOB_EVENT_KILL:
+		//先判断任务是否在执行中，取消掉command执行
+		if jobExecutePlanInfo, jobExecuting = scheduler.jobExcutingTableMap[jobEvent.Job.Name]; jobExecuting {
+			//如果在执行 触发command杀死任务子进程，任务得到退出
+			jobExecutePlanInfo.CancleFunc()
+		}
 	}
+	
 }
 
 //处理任务结果
 func (scheduler *JobScheduler) HandleJobResult(result *common.JobExecuteResult) {
+	var (
+		jobExecuteLog  *common.JobExecuteLog
+	)
 	//删除执行状态
 	delete(scheduler.jobExcutingTableMap, result.JobExecutePlanInfo.Job.Name)
+
+	//生成执行日志
+	if result.Err != common.ERR_DISTRIBUTED_ALREADY_LOCK {
+		//当不是因为锁被占用而失败的情况下，锁被占用是正常情况 跳过
+		jobExecuteLog = &common.JobExecuteLog{
+			JobName:result.JobExecutePlanInfo.Job.Name,
+			Command:result.JobExecutePlanInfo.Job.Command,
+			Output:string(result.OutPut),
+			PlanTime:result.JobExecutePlanInfo.PlanExecTime.UnixNano() /1000 / 1000 , //毫秒
+			ScheduleTime:result.JobExecutePlanInfo.RealExecTime.UnixNano() /1000 / 1000, //毫秒
+			StartTime:result.StartTime.UnixNano() /1000 / 1000, //毫秒
+			EndTime:result.EndTime.UnixNano() /1000 / 1000, //毫秒
+		}
+
+		if result.Err != nil {
+			jobExecuteLog.Err = result.Err.Error() //错误信息
+		} else {
+			jobExecuteLog.Err = ""
+		}
+		//TODO: 存储日志到mongo中 需要在另一个协程中执行 不要影响schedulerCheckLoop调度任务检测
+		G_jobLogStorager.AppendJobLogs(jobExecuteLog)
+	}
 	//打印结果信息
 	fmt.Println("任务执行完成:", result.JobExecutePlanInfo.Job.Name, result.OutPut, result.Err)
 }
@@ -136,7 +171,7 @@ func (scheduler *JobScheduler) schedulerCheckLoop()  {
 	//定时任务 common.Job
 	for  {
 		select {
-		//循环监听任务变化事件
+		//循环监听任务变化事件 包括添加 修改 强杀任务
 		case jobEvent = <- scheduler.jobEventChan:
 			//对内存chan中的任务做增删改查操作
 			G_scheduler.HandleJobEvent(jobEvent)

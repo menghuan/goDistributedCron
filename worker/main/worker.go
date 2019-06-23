@@ -41,6 +41,11 @@ func main() {
 		goto ERR
 	}
 
+	//启动日志协程
+	if err = worker.InitJobLogStorager(); err != nil {
+		goto ERR
+	}
+
 	//初始化任务执行器
 	if err = worker.InitJobExecutor(); err != nil {
 		goto ERR

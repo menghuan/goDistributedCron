@@ -8,9 +8,17 @@ import (
 //config配置文件结构
 type Config struct {
 	//etcd 集群地址
-	EtcdEndpoints    []string `json:"etcdEndpoints"`
+	EtcdEndpoints    		[]string 	`json:"etcdEndpoints"`
 	//etcd超时
-	EtcdDialTimeout  int `json:"etcdDialTimeout"`
+	EtcdDialTimeout  		int 		`json:"etcdDialTimeout"`
+	//mongodb地址
+	MongodbUri       		string   	`json:"mongodbUri"`
+	//mongodb链接超时时间
+	MongodbConnectTimeOut  	int  		`json:"mongodbConnectTimeOut"`
+	//日志批次大小
+	JobLogBatchSize         int      	`json:"jobLogBatchSize"`
+	//日志提交超时时间
+	JobLogCommitTimeout     int      	`json:"jobLogCommitTimeout"`
 }
 
 var (

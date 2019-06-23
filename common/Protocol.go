@@ -1,6 +1,7 @@
 package common
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/gorhill/cronexpr"
 	"strings"
@@ -50,6 +51,36 @@ type JobExecutingPlan struct {
 	PlanExecTime 		time.Time
 	//实际调度执行时间
 	RealExecTime  		time.Time
+	//任务command的context
+	CancleCtx			context.Context
+	//用于取消command执行的cancle函数
+	CancleFunc			context.CancelFunc
+}
+
+//任务执行日志
+type JobExecuteLog struct {
+	//任务名称
+	JobName			string   	`bson:"jobName"`
+	//脚本命令
+	Command			string   	`bson:"command"`
+	//错误原因
+	Err				string   	`bson:"err"`
+	//脚本输出
+	Output			string   	`bson:"output"`
+	//计划执行时间 毫秒
+	PlanTime		int64   	`bson:"plantime"`
+	//实际调度时间 毫秒  如果跟计划执行时间间隔很长 说明调度任务比较繁忙 一般情况在亚秒级
+	ScheduleTime	int64		`bson:"scheduletime"`
+	//任务执行开始时间 毫秒
+	StartTime		int64   	`bson:"starttime"`
+	//任务执行结束时间 毫秒
+	EndTime			int64   	`bson:"endtime"`
+}
+
+// 日志批次
+type JobExecuteLogBatch struct {
+	// 多条日志
+	Logs []interface{}
 }
 
 
@@ -103,9 +134,14 @@ func UnpackJob(value []byte) (ret *Job, err error)  {
 	return
 }
 
-//从etcd的key中提取任务名  /cron/jobs/jobxx  删掉/cron/jobs 得到jobxx
+//从etcd的key中提取任务名  /distributed_cron/jobs/jobxx  删掉/distributed_cron/jobs 得到jobxx
 func ExtractJobName(jobKey string) string  {
 	return strings.TrimPrefix(jobKey, ETCD_JOB_SAVE_DIR)
+}
+
+//从etcd的key中提取强杀的任务名  /distributed_cron/killers/jobxx  删掉/distributed_cron/jobs 得到jobxx
+func ExtractKillerJobName(jobKillerKey string) string  {
+	return strings.TrimPrefix(jobKillerKey, ETCD_JOB_KILLER_DIR)
 }
 
 //任务变化事件封装  主要有2种 1）更新任务 2）删除任务
@@ -144,5 +180,7 @@ func BuildJobExcutingPlan(jobSchedulerPlan *JobSchedulerPlan) (jobExecutingPlan 
 		PlanExecTime:jobSchedulerPlan.NextTime, //计划调度执行时间
 		RealExecTime:time.Now(), //实际调度执行时间
 	}
+	//获取执行任务的上下文和取消函数
+	jobExecutingPlan.CancleCtx, jobExecutingPlan.CancleFunc = context.WithCancel(context.TODO())
 	return
 }
