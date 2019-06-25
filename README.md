@@ -21,4 +21,4 @@
 	
 	
 # 系统简单架构图如下:
-   <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/doc/go_cron_arch.png" width="800px"></p>
+   <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/go_cron_arch.png" width="800px"></p>
