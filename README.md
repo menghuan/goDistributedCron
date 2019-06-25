@@ -18,3 +18,7 @@
     3. 实现执行模块，并发的执行多个job
     4. 实现分布式锁，解决并发惊群调度问题
     5. 把执行的日志保存到存储中
+	
+	
+# 系统简单架构图如下:
+   <p align="center"><img src="https://github.com/menghuan/goDistributedCron/doc/go_cron_arch.png.png" width="800px"></p>
