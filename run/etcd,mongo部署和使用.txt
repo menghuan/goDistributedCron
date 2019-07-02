@@ -1,0 +1,126 @@
+[etcd]
+1. 下载包地址: https://github.com/etcd-io/etcd/releases/download/v3.3.13/etcd-v3.3.13-linux-amd64.tar.gz
+    wget https://github.com/etcd-io/etcd/releases/download/v3.3.13/etcd-v3.3.13-linux-amd64.tar.gz
+
+2. 解压到 /home/src/etcd-v3.3.13-linux-amd64下面
+   cd /home/src && tar xf etcd-v3.3.13-linux-amd64.tar.gz
+
+3. 目录内容如下:
+    ll
+        total 29792
+        drwx------.  3 root root     4096 May 27 22:34 default.etcd
+        drwxr-xr-x. 10 1000 1000     4096 May  3 01:55 Documentation
+        -rwxr-xr-x.  1 1000 1000 16927136 May  3 01:55 etcd
+        -rwxr-xr-x.  1 1000 1000 13498880 May  3 01:55 etcdctl
+        -rw-------.  1 root root    11303 Jun 28 10:37 nohup.out
+        -rw-r--r--.  1 1000 1000    38864 May  3 01:55 README-etcdctl.md
+        -rw-r--r--.  1 1000 1000     7262 May  3 01:55 README.md
+        -rw-r--r--.  1 1000 1000     7855 May  3 01:55 READMEv2-etcdctl.md
+
+4. 启动服务
+  nohup ./etcd --listen-client-urls 'http://0.0.0.0:2379' --advertise-client-urls 'http://0.0.0.0:2379' &
+
+5. 查看启动服务
+  ps -ef|grep etcd
+  root      2108     1  0 May27 ?        03:45:35 ./etcd --listen-client-urls http://0.0.0.0:2379 --advertise-client-urls http://0.0.0.0:2379
+
+6. 任务变化
+   cd /home/src/etcd-v3.3.13-linux-amd64/
+   说明:
+      ETCDCTL_API:api版本最新是3
+      etcdctl:etcd管理工具
+      watch/get/put/del:动作
+      "/distributed_cron/jobs/": 任务名称路径
+      --prefix  前缀是"/distributed_cron/jobs/"这个任务
+
+   1) 监听(实时): ETCDCTL_API=3 ./etcdctl watch "/distributed_cron/jobs/" --prefix
+   2) 添加: ETCDCTL_API=3 ./etcdctl put   "/distributed_cron/jobs/job1" "{...job1}"
+   3) 获取:
+      ETCDCTL_API=3 ./etcdctl get "/distributed_cron/jobs"
+      ETCDCTL_API=3 ./etcdctl get "/distributed_cron/jobs" --prefix
+   4) 删除:  ETCDCTL_API=3 ./etcdctl del "/distributed_cron/jobs/job1"
+
+
+
+
+[mongodb]
+1.下载包地址: https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-4.0.9.tgz
+   wget https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-4.0.9.tgz
+
+2. 解压到 /home/src/mongodb-linux-x86_64-4.0.9下面
+    cd /home/src && tar xf mongodb-linux-x86_64-4.0.9.tar.gz
+
+3. 目录内容如下:
+  ll
+     total 144
+     drwxr-xr-x. 2 root root  4096 May 25 09:16 bin
+     drwxr-xr-x. 4 root root  4096 Jun 23 21:01 data
+     -rw-r--r--. 1 root root 30608 Apr 11 09:59 LICENSE-Community.txt
+     -rw-r--r--. 1 root root 16726 Apr 11 09:59 MPL-2
+     -rw-------. 1 root root 18523 Jun 23 21:01 nohup.out
+     -rw-r--r--. 1 root root  2601 Apr 11 09:59 README
+     -rw-r--r--. 1 root root 60005 Apr 11 09:59 THIRD-PARTY-NOTICES
+
+4. 启动服务
+   nohup bin/mongod  --dbpath=./data --bind_ip=0.0.0.0 &
+
+5. 查看启动服务
+  ps -ef|grep mongo
+  root     24295 24201 10 17:16 pts/1    00:00:01 bin/mongod --dbpath=./data --bind_ip=0.0.0.0
+
+6. 查看log日志数据
+bin/mongo
+    MongoDB shell version v4.0.9
+    connecting to: mongodb://127.0.0.1:27017/?gssapiServiceName=mongodb
+    Implicit session: session { "id" : UUID("4c72ed6e-6b18-4a7e-aafa-2d377ac5b5f0") }
+    MongoDB server version: 4.0.9
+    Server has startup warnings:
+    2019-06-18T17:16:55.094+0800 I STORAGE  [initandlisten]
+    2019-06-18T17:16:55.094+0800 I STORAGE  [initandlisten] ** WARNING: Using the XFS filesystem is strongly recommended with the WiredTiger storage engine
+    2019-06-18T17:16:55.094+0800 I STORAGE  [initandlisten] **          See http://dochub.mongodb.org/core/prodnotes-filesystem
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten]
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten] ** WARNING: Access control is not enabled for the database.
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten] **          Read and write access to data and configuration is unrestricted.
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten] ** WARNING: You are running this process as the root user, which is not recommended.
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten]
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten]
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/enabled is 'always'.
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten] **        We suggest setting it to 'never'
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten]
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten] ** WARNING: /sys/kernel/mm/transparent_hugepage/defrag is 'always'.
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten] **        We suggest setting it to 'never'
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten]
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten] ** WARNING: soft rlimits too low. rlimits set to 15088 processes, 65535 files. Number of processes should be at least 32767.5 : 0.5 times number of files.
+    2019-06-18T17:16:56.229+0800 I CONTROL  [initandlisten]
+
+
+  > use distributedcron
+  switched to db cron
+  > show collections
+  log
+  >
+  > db.log.find();
+  { "_id" : ObjectId("5d0f267bcd57559adc17c318"), "jobName" : "job8", "command" : "echo hello8", "err" : "", "output" : "hello8\n", "plantime" : NumberLong("1561273978000"), "scheduletime" : NumberLong("1561273978000"), "starttime" : NumberLong("1561273978086"), "endtime" : NumberLong("1561273978089") }
+  { "_id" : ObjectId("5d0f267bcd57559adc17c319"), "jobName" : "job7", "command" : "echo hello7", "err" : "", "output" : "hello7\n", "plantime" : NumberLong("1561273978000"), "scheduletime" : NumberLong("1561273978000"), "starttime" : NumberLong("1561273978891"), "endtime" : NumberLong("1561273978893") }
+  { "_id" : ObjectId("5d0f267dcd57559adc17c31a"), "jobName" : "job1", "command" : "echo hello", "err" : "", "output" : "hello\n", "plantime" : NumberLong("1561273980000"), "scheduletime" : NumberLong("1561273980000"), "starttime" : NumberLong("1561273980063"), "endtime" : NumberLong("1561273980064") }
+  { "_id" : ObjectId("5d0f267dcd57559adc17c31b"), "jobName" : "job2", "command" : "echo hello2", "err" : "", "output" : "hello2\n", "plantime" : NumberLong("1561273980000"), "scheduletime" : NumberLong("1561273980000"), "starttime" : NumberLong("1561273980085"), "endtime" : NumberLong("1561273980087") }
+  { "_id" : ObjectId("5d0f267dcd57559adc17c31c"), "jobName" : "job7", "command" : "echo hello7", "err" : "", "output" : "hello7\n", "plantime" : NumberLong("1561273980000"), "scheduletime" : NumberLong("1561273980000"), "starttime" : NumberLong("1561273980305"), "endtime" : NumberLong("1561273980306") }
+  { "_id" : ObjectId("5d0f267dcd57559adc17c31d"), "jobName" : "job3", "command" : "echo hello3", "err" : "", "output" : "hello3\n", "plantime" : NumberLong("1561273980000"), "scheduletime" : NumberLong("1561273980000"), "starttime" : NumberLong("1561273980322"), "endtime" : NumberLong("1561273980324") }
+  { "_id" : ObjectId("5d0f267dcd57559adc17c31e"), "jobName" : "job4", "command" : "echo hello4", "err" : "", "output" : "hello4\n", "plantime" : NumberLong("1561273980000"), "scheduletime" : NumberLong("1561273980000"), "starttime" : NumberLong("1561273980429"), "endtime" : NumberLong("1561273980431") }
+  { "_id" : ObjectId("5d0f267dcd57559adc17c31f"), "jobName" : "job6", "command" : "echo hello6", "err" : "", "output" : "hello6\n", "plantime" : NumberLong("1561273980000"), "scheduletime" : NumberLong("1561273980000"), "starttime" : NumberLong("1561273980460"), "endtime" : NumberLong("1561273980462") }
+  { "_id" : ObjectId("5d0f267dcd57559adc17c320"), "jobName" : "job5", "command" : "echo hello5", "err" : "", "output" : "hello5\n", "plantime" : NumberLong("1561273980000"), "scheduletime" : NumberLong("1561273980000"), "starttime" : NumberLong("1561273980544"), "endtime" : NumberLong("1561273980546") }
+  { "_id" : ObjectId("5d0f267dcd57559adc17c321"), "jobName" : "job8", "command" : "echo hello8", "err" : "", "output" : "hello8\n", "plantime" : NumberLong("1561273980000"), "scheduletime" : NumberLong("1561273980000"), "starttime" : NumberLong("1561273980698"), "endtime" : NumberLong("1561273980699") }
+  { "_id" : ObjectId("5d0f267fcd57559adc17c322"), "jobName" : "job7", "command" : "echo hello7", "err" : "", "output" : "hello7\n", "plantime" : NumberLong("1561273982000"), "scheduletime" : NumberLong("1561273982000"), "starttime" : NumberLong("1561273982093"), "endtime" : NumberLong("1561273982095") }
+  { "_id" : ObjectId("5d0f267fcd57559adc17c323"), "jobName" : "job8", "command" : "echo hello8", "err" : "", "output" : "hello8\n", "plantime" : NumberLong("1561273982000"), "scheduletime" : NumberLong("1561273982000"), "starttime" : NumberLong("1561273982166"), "endtime" : NumberLong("1561273982168") }
+  { "_id" : ObjectId("5d0f2681cd57559adc17c324"), "jobName" : "job7", "command" : "echo hello7", "err" : "", "output" : "hello7\n", "plantime" : NumberLong("1561273984000"), "scheduletime" : NumberLong("1561273984000"), "starttime" : NumberLong("1561273984215"), "endtime" : NumberLong("1561273984217") }
+  { "_id" : ObjectId("5d0f2681cd57559adc17c325"), "jobName" : "job8", "command" : "echo hello8", "err" : "", "output" : "hello8\n", "plantime" : NumberLong("1561273984000"), "scheduletime" : NumberLong("1561273984000"), "starttime" : NumberLong("1561273984278"), "endtime" : NumberLong("1561273984280") }
+  { "_id" : ObjectId("5d0f2681cd57559adc17c326"), "jobName" : "job1", "command" : "echo hello", "err" : "", "output" : "hello\n", "plantime" : NumberLong("1561273985000"), "scheduletime" : NumberLong("1561273985000"), "starttime" : NumberLong("1561273985111"), "endtime" : NumberLong("1561273985113") }
+  { "_id" : ObjectId("5d0f2682cd57559adc17c327"), "jobName" : "job6", "command" : "echo hello6", "err" : "", "output" : "hello6\n", "plantime" : NumberLong("1561273985000"), "scheduletime" : NumberLong("1561273985000"), "starttime" : NumberLong("1561273985241"), "endtime" : NumberLong("1561273985243") }
+  { "_id" : ObjectId("5d0f2682cd57559adc17c328"), "jobName" : "job5", "command" : "echo hello5", "err" : "", "output" : "hello5\n", "plantime" : NumberLong("1561273985000"), "scheduletime" : NumberLong("1561273985000"), "starttime" : NumberLong("1561273985449"), "endtime" : NumberLong("1561273985450") }
+  { "_id" : ObjectId("5d0f2682cd57559adc17c329"), "jobName" : "job3", "command" : "echo hello3", "err" : "", "output" : "hello3\n", "plantime" : NumberLong("1561273985000"), "scheduletime" : NumberLong("1561273985000"), "starttime" : NumberLong("1561273985472"), "endtime" : NumberLong("1561273985473") }
+  { "_id" : ObjectId("5d0f2682cd57559adc17c32a"), "jobName" : "job2", "command" : "echo hello2", "err" : "", "output" : "hello2\n", "plantime" : NumberLong("1561273985000"), "scheduletime" : NumberLong("1561273985000"), "starttime" : NumberLong("1561273985499"), "endtime" : NumberLong("1561273985500") }
+  { "_id" : ObjectId("5d0f2682cd57559adc17c32b"), "jobName" : "job4", "command" : "echo hello4", "err" : "", "output" : "hello4\n", "plantime" : NumberLong("1561273985000"), "scheduletime" : NumberLong("1561273985000"), "starttime" : NumberLong("1561273985532"), "endtime" : NumberLong("1561273985534") }
+
+
+
+

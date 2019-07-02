@@ -1,0 +1,24 @@
+[Unit]
+# 服务描述
+Description=distributed-cron-master
+# 要求必须执行网络
+Requires=network-online.target
+# 依赖，当依赖的服务启动之后再启动自定义的服务 在网络启动之后启动
+After=network-online.target
+
+[Service]
+# 简单服务
+Type=simple
+# 运行用户与用户组
+User=work
+Group=work
+# 进程退出立即重启
+Restart=always
+# 执行命令
+ExecStart=/usr/go/src/goDistributedCron/master/main -config=/usr/go/src/goDistributedCron/master/master.json
+# 进程工作目录
+WorkingDirectory=/usr/go/src/goDistributedCron/master
+
+[Install]
+# 多用户 在系统启动后加载UNIT
+WantedBy=multi-user.target
