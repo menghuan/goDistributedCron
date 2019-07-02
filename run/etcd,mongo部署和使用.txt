@@ -95,7 +95,7 @@ bin/mongo
 
 
   > use distributedcron
-  switched to db cron
+  switched to db distributedcron
   > show collections
   log
   >
