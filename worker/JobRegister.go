@@ -10,11 +10,11 @@ import (
 
 // 注册节点到etcd： /distributed_cron/workers/IP地址
 type JobRegister struct {
-	client 		*clientv3.Client
-	kv     		clientv3.KV
-	lease  		clientv3.Lease
+	client *clientv3.Client
+	kv     clientv3.KV
+	lease  clientv3.Lease
 
-	localIP 	string // 本机IP
+	localIP string // 本机IP
 }
 
 var (
@@ -52,13 +52,13 @@ func getLocalIP() (ipv4 string, err error) {
 // 注册到/distributed_cron/workers/IP, 并自动续租
 func (jobRegister *JobRegister) workerListKeepOnline() {
 	var (
-		regKey         		string
-		leaseGrantResp 		*clientv3.LeaseGrantResponse
-		err            		error
-		keepAliveChan  		<-chan *clientv3.LeaseKeepAliveResponse
-		keepAliveResp  		*clientv3.LeaseKeepAliveResponse
-		cancelCtx      		context.Context
-		cancelFunc     		context.CancelFunc
+		regKey         string
+		leaseGrantResp *clientv3.LeaseGrantResponse
+		err            error
+		keepAliveChan  <-chan *clientv3.LeaseKeepAliveResponse
+		keepAliveResp  *clientv3.LeaseKeepAliveResponse
+		cancelCtx      context.Context
+		cancelFunc     context.CancelFunc
 	)
 
 	for {
@@ -105,11 +105,11 @@ func (jobRegister *JobRegister) workerListKeepOnline() {
 //初始化注册发现 基于etcd
 func InitJobRegister() (err error) {
 	var (
-		config  	clientv3.Config
-		client  	*clientv3.Client
-		kv      	clientv3.KV
-		lease   	clientv3.Lease
-		localIp 	string
+		config  clientv3.Config
+		client  *clientv3.Client
+		kv      clientv3.KV
+		lease   clientv3.Lease
+		localIp string
 	)
 
 	// 初始化配置

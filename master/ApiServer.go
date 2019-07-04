@@ -24,34 +24,34 @@ var (
 // POST job = {"name":"job1", "command":"echo hello", "cronExpr":"* * * * *"}
 func handleJobSave(resp http.ResponseWriter, req *http.Request) {
 	var (
-		err      error
-		postJob  string
-		job      common.Job
-		oldJob   *common.Job
-		bytes    []byte
+		err     error
+		postJob string
+		job     common.Job
+		oldJob  *common.Job
+		bytes   []byte
 	)
-   //1. 解析post表单数据
-   if err = req.ParseForm(); err != nil {
-   	   goto ERR
-   }
-   //2. 取表单中的job字段
-   postJob = req.PostForm.Get("job")
-   //3. 反序列化job 保存job job传给-->jobmanager-->etcd
-   if err = json.Unmarshal([]byte(postJob), &job); err != nil {
-   	    goto ERR
-   }
-   //4. 保存到etcd
-   if oldJob,err = G_jobMgr.SaveJob(&job); err != nil {
-   	    goto ERR
-   }
+	//1. 解析post表单数据
+	if err = req.ParseForm(); err != nil {
+		goto ERR
+	}
+	//2. 取表单中的job字段
+	postJob = req.PostForm.Get("job")
+	//3. 反序列化job 保存job job传给-->jobmanager-->etcd
+	if err = json.Unmarshal([]byte(postJob), &job); err != nil {
+		goto ERR
+	}
+	//4. 保存到etcd
+	if oldJob, err = G_jobMgr.SaveJob(&job); err != nil {
+		goto ERR
+	}
 
-   //5. 返回正常应答 ({"errno":0,"msg":"", "data":{....}})
-   if bytes, err = common.BuildResponse(0, "success", oldJob); err == nil {
-	   //bytes是[]byte类型，转化成string类型便于查看
-	   fmt.Println(string(bytes))
-	   resp.Write(bytes)
-   }
-   return
+	//5. 返回正常应答 ({"errno":0,"msg":"", "data":{....}})
+	if bytes, err = common.BuildResponse(0, "success", oldJob); err == nil {
+		//bytes是[]byte类型，转化成string类型便于查看
+		fmt.Println(string(bytes))
+		resp.Write(bytes)
+	}
+	return
 ERR:
 	//6. 返回异常应答
 	if bytes, err = common.BuildResponse(-1, err.Error(), nil); err == nil {
@@ -65,10 +65,10 @@ ERR:
 //POST /job/delete  name=job1
 func handleJobDelete(resp http.ResponseWriter, req *http.Request) {
 	var (
-		err error //interface{}
-		name string
+		err    error //interface{}
+		name   string
 		oldJob *common.Job
-		bytes []byte
+		bytes  []byte
 	)
 	//POST : a=1&b=2&c=3
 	if err = req.ParseForm(); err != nil {
@@ -77,12 +77,12 @@ func handleJobDelete(resp http.ResponseWriter, req *http.Request) {
 	//获取删除的名称
 	name = req.PostForm.Get("name")
 	//去删除任务 调用jobManager删除功能
-    if oldJob, err = G_jobMgr.DeleteJob(name); err != nil {
-    	goto ERR
+	if oldJob, err = G_jobMgr.DeleteJob(name); err != nil {
+		goto ERR
 	}
 
-    //正常应答
-    if bytes, err = common.BuildResponse(0, "success", oldJob); err == nil {
+	//正常应答
+	if bytes, err = common.BuildResponse(0, "success", oldJob); err == nil {
 		resp.Write(bytes)
 	}
 	return
@@ -94,16 +94,16 @@ ERR:
 
 //获取任务列表
 func handleJobList(resp http.ResponseWriter, req *http.Request) {
-     var (
-     	jobList []*common.Job
-     	err     error
-     	bytes   []byte
-	 )
+	var (
+		jobList []*common.Job
+		err     error
+		bytes   []byte
+	)
 
-     //获取任务列表
-     if jobList, err = G_jobMgr.ListJobs(); err != nil {
-     	goto ERR
-	 }
+	//获取任务列表
+	if jobList, err = G_jobMgr.ListJobs(); err != nil {
+		goto ERR
+	}
 
 	//正常应答
 	if bytes, err = common.BuildResponse(0, "success", jobList); err == nil {
@@ -116,14 +116,13 @@ ERR:
 	}
 }
 
-
 //强制杀死某个任务
 // POST /job/kill name=job1
 func handleJobKill(resp http.ResponseWriter, req *http.Request) {
 	var (
-		name    string
-		err     error
-		bytes   []byte
+		name  string
+		err   error
+		bytes []byte
 	)
 
 	if err = req.ParseForm(); err != nil {
@@ -250,22 +249,21 @@ func InitApiServer() (err error) {
 	// /index.html   ./static_webroot/index.html
 	mux.Handle("/", http.StripPrefix("/", staticHandler))
 
-
 	//启动TCP监听 此处err不定义局部变量 直接返回值返回
-	if listener, err = net.Listen("tcp", ":" + strconv.Itoa(G_config.ApiPort)); err != nil {
+	if listener, err = net.Listen("tcp", ":"+strconv.Itoa(G_config.ApiPort)); err != nil {
 		return
 	}
 
 	//创建一个http服务
 	httpServer = &http.Server{
-		ReadTimeout: time.Duration(G_config.ApiReadTimeout),
-		WriteTimeout:time.Duration(G_config.ApiWriteTimeout),
-		Handler:mux,
+		ReadTimeout:  time.Duration(G_config.ApiReadTimeout),
+		WriteTimeout: time.Duration(G_config.ApiWriteTimeout),
+		Handler:      mux,
 	}
 
 	//赋值单例
 	G_apiServer = &ApiServer{
-		httpServer:httpServer,
+		httpServer: httpServer,
 	}
 
 	//启动服务端

@@ -11,20 +11,19 @@ import (
 //暂时先用MongoDB存储日志 后续会换成es
 type JobLogStorager struct {
 	//mongo客户端
-	client 			*mongo.Client
+	client *mongo.Client
 	//mongo集合
-	logCollection  	*mongo.Collection
+	logCollection *mongo.Collection
 	//日志channel队列
-	logChan        	chan *common.JobExecuteLog
+	logChan chan *common.JobExecuteLog
 	//自动提交chan
-	autoCommitChan  chan *common.JobExecuteLogBatch
+	autoCommitChan chan *common.JobExecuteLogBatch
 }
 
 //单例
 var (
-	G_jobLogStorager  *JobLogStorager
+	G_jobLogStorager *JobLogStorager
 )
-
 
 // 批量写入日志
 func (jobLogStorager *JobLogStorager) saveJobLogs(batch *common.JobExecuteLogBatch) {
@@ -32,9 +31,9 @@ func (jobLogStorager *JobLogStorager) saveJobLogs(batch *common.JobExecuteLogBat
 }
 
 //日志存储协程
-func (jobLogStorager *JobLogStorager) writeJobLogLoop()  {
+func (jobLogStorager *JobLogStorager) writeJobLogLoop() {
 	var (
-		log 		 *common.JobExecuteLog
+		log          *common.JobExecuteLog
 		logBatch     *common.JobExecuteLogBatch // 当前的批次
 		commitTimer  *time.Timer
 		timeoutBatch *common.JobExecuteLogBatch // 超时批次
@@ -82,12 +81,10 @@ func (jobLogStorager *JobLogStorager) writeJobLogLoop()  {
 	}
 }
 
-
-
 //初始化日志存储
-func InitJobLogStorager() (err error){
+func InitJobLogStorager() (err error) {
 	var (
-		client   *mongo.Client
+		client *mongo.Client
 	)
 
 	// 建立mongodb连接
@@ -100,8 +97,8 @@ func InitJobLogStorager() (err error){
 
 	// 选择db和collection
 	G_jobLogStorager = &JobLogStorager{
-		client:			client,
-		logCollection:	client.Database("cron").Collection("log"),
+		client:         client,
+		logCollection:  client.Database("cron").Collection("log"),
 		logChan:        make(chan *common.JobExecuteLog, 1000),
 		autoCommitChan: make(chan *common.JobExecuteLogBatch, 1000),
 	}

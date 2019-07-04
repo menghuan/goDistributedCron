@@ -7,12 +7,14 @@ import (
 	"runtime"
 	"time"
 )
+
 var (
 	//配置文件路径
 	configFilePath string
 )
+
 //解析命令行参数
-func initArgs()  {
+func initArgs() {
 	//通过flag库来解析命令行参数 worker -config ./worker.json
 	//worker -h 查看帮助
 	flag.StringVar(&configFilePath, "config", "./worker.json", "指定worker.json")
@@ -21,7 +23,7 @@ func initArgs()  {
 }
 
 //初始化环境
-func initEnv()  {
+func initEnv() {
 	//初始化线程  线程数跟cpu核心一样 性能最好
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }

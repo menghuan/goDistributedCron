@@ -8,36 +8,35 @@ import (
 
 //基于etcd的分布式锁 （事务TXN）
 type JobDistributedLock struct {
-	kv 			clientv3.KV
-	lease 		clientv3.Lease
-	jobName 	string 				//任务名
-	cancleFunc	context.CancelFunc  //用于终止自动续租
-	leaseId 	clientv3.LeaseID    // 租约ID
-	isLocked	bool                // 是否上锁成功
+	kv         clientv3.KV
+	lease      clientv3.Lease
+	jobName    string             //任务名
+	cancleFunc context.CancelFunc //用于终止自动续租
+	leaseId    clientv3.LeaseID   // 租约ID
+	isLocked   bool               // 是否上锁成功
 }
 
 //初始化分布式锁对象
 func InitJobDistributedLock(jobName string, kv clientv3.KV, lease clientv3.Lease) (jobDistributedLock *JobDistributedLock) {
 	jobDistributedLock = &JobDistributedLock{
-		kv:kv,
-		lease:lease,
-		jobName:jobName,
+		kv:      kv,
+		lease:   lease,
+		jobName: jobName,
 	}
 	return
 }
 
-
 //尝试分布式锁 基于etcd
-func (jobDistributedLock *JobDistributedLock) TryJobDistributedLock() (err error){
+func (jobDistributedLock *JobDistributedLock) TryJobDistributedLock() (err error) {
 	var (
-		leaseGrantResp  *clientv3.LeaseGrantResponse
-		cancleCtx 		context.Context
-		cancleFunc		context.CancelFunc
-		leaseId			clientv3.LeaseID
-		keepRespChan	<- chan *clientv3.LeaseKeepAliveResponse
-		txn				clientv3.Txn
-		lockKey			string
-		txtResp			*clientv3.TxnResponse
+		leaseGrantResp *clientv3.LeaseGrantResponse
+		cancleCtx      context.Context
+		cancleFunc     context.CancelFunc
+		leaseId        clientv3.LeaseID
+		keepRespChan   <-chan *clientv3.LeaseKeepAliveResponse
+		txn            clientv3.Txn
+		lockKey        string
+		txtResp        *clientv3.TxnResponse
 	)
 	//1.创建租约（5秒）
 	if leaseGrantResp, err = jobDistributedLock.lease.Grant(context.TODO(), 5); err != nil {
@@ -58,11 +57,11 @@ func (jobDistributedLock *JobDistributedLock) TryJobDistributedLock() (err error
 	//3.处理续租应答的协程
 	go func() {
 		var (
-			keepResp    *clientv3.LeaseKeepAliveResponse
+			keepResp *clientv3.LeaseKeepAliveResponse
 		)
 		for {
 			select {
-			case keepResp = <- keepRespChan: //自动续租的应答
+			case keepResp = <-keepRespChan: //自动续租的应答
 				if keepResp == nil {
 					goto END
 				}
@@ -112,9 +111,8 @@ LOCKFAIL:
 	return
 }
 
-
 //释放分布式锁
-func (jobDistributedLock *JobDistributedLock) UnLock()  {
+func (jobDistributedLock *JobDistributedLock) UnLock() {
 	//当锁成功后
 	if jobDistributedLock.isLocked {
 		//取消自动续租的协程

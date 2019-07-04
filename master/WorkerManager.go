@@ -31,7 +31,7 @@ func (workerManager *WorkerManager) ListWorkers() (workerArr []string, err error
 	workerArr = make([]string, 0)
 
 	// 获取目录下所有Kv
-	if getResp, err = workerManager.kv.Get(context.TODO(),common.ETCD_JOB_WORKER_DIR , clientv3.WithPrefix()); err != nil {
+	if getResp, err = workerManager.kv.Get(context.TODO(), common.ETCD_JOB_WORKER_DIR, clientv3.WithPrefix()); err != nil {
 		return
 	}
 

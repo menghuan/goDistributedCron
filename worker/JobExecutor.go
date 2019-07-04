@@ -9,12 +9,11 @@ import (
 
 //任务执行器
 type JobExecutor struct {
-
 }
 
 //单例
 var (
-	G_executor  *JobExecutor
+	G_executor *JobExecutor
 )
 
 //执行一个任务
@@ -22,17 +21,17 @@ func (excutor *JobExecutor) ExecuteJob(planInfo *common.JobExecutingPlan) {
 	//启动一个协程来执行任务
 	go func() {
 		var (
-			cmd     					*exec.Cmd
-			err     					error
-			outPutInfo  				[]byte
-			result						*common.JobExecuteResult
-			jobDistributedLock			*JobDistributedLock
+			cmd                *exec.Cmd
+			err                error
+			outPutInfo         []byte
+			result             *common.JobExecuteResult
+			jobDistributedLock *JobDistributedLock
 		)
 
 		//拼装任务执行结果
 		result = &common.JobExecuteResult{
-			JobExecutePlanInfo:planInfo,
-			OutPut:make([]byte, 0),
+			JobExecutePlanInfo: planInfo,
+			OutPut:             make([]byte, 0),
 		}
 
 		//先获取分布式锁 然后在执行任务
@@ -76,9 +75,7 @@ func (excutor *JobExecutor) ExecuteJob(planInfo *common.JobExecutingPlan) {
 }
 
 //启动执行器
-func InitJobExecutor() (err error)  {
-	G_executor = &JobExecutor{
-
-	}
+func InitJobExecutor() (err error) {
+	G_executor = &JobExecutor{}
 	return
 }
