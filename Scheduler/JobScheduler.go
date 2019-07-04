@@ -1,7 +1,9 @@
-package worker
+package Scheduler
 
 import (
 	"fmt"
+	"goDistributedCron/Executor"
+	"goDistributedCron/Log"
 	"goDistributedCron/common"
 	"time"
 )
@@ -85,7 +87,7 @@ func (scheduler *JobScheduler) HandleJobResult(result *common.JobExecuteResult) 
 			jobExecuteLog.Err = ""
 		}
 		//TODO: 存储日志到mongo中 需要在另一个协程中执行 不要影响schedulerCheckLoop调度任务检测
-		G_jobLogStorager.AppendJobLogs(jobExecuteLog)
+		Log.G_jobLogStorager.AppendJobLogs(jobExecuteLog)
 	}
 	//打印结果信息
 	fmt.Println("任务执行完成:", result.JobExecutePlanInfo.Job.Name, result.OutPut, result.Err)
@@ -115,7 +117,7 @@ func (scheduler *JobScheduler) TryStartJob(jobPlan *common.JobSchedulerPlan) {
 	fmt.Println("正在执行任务:", jobExcutingPlan.Job.Name, jobExcutingPlan.PlanExecTime, jobExcutingPlan.RealExecTime)
 
 	//开始执行任务
-	G_executor.ExecuteJob(jobExcutingPlan)
+	Executor.G_executor.ExecuteJob(jobExcutingPlan)
 }
 
 //重新计算任务调度状态 jobSchedulerPlan *common.JobSchedulerPlan
@@ -154,7 +156,7 @@ func (scheduler *JobScheduler) RecalculateScheduler() (schedulerAfterTime time.D
 }
 
 //调度协程检测
-func (scheduler *JobScheduler) schedulerCheckLoop() {
+func (scheduler *JobScheduler) SchedulerCheckLoop() {
 	var (
 		jobEvent           *common.JobEvent
 		schedulerAfterTime time.Duration
@@ -188,8 +190,13 @@ func (scheduler *JobScheduler) schedulerCheckLoop() {
 }
 
 //push任务事件到调度协程器
-func (scheduler *JobScheduler) pushJobEvent(jobEvent *common.JobEvent) {
+func (scheduler *JobScheduler) PushJobEvent(jobEvent *common.JobEvent) {
 	scheduler.jobEventChan <- jobEvent
+}
+
+//执行完结果后 回传任务执行结果给Scheduler
+func (scheduler *JobScheduler) PushJobResult(jobResult *common.JobExecuteResult) {
+	scheduler.jobExecuteResultChan <- jobResult
 }
 
 //初始化任务调度器
@@ -206,11 +213,7 @@ func InitJobScheduler() (err error) {
 	}
 
 	//启动调度协程
-	go G_scheduler.schedulerCheckLoop()
+	go G_scheduler.SchedulerCheckLoop()
 	return
 }
 
-//执行完结果后 回传任务执行结果给Scheduler
-func (scheduler *JobScheduler) PushJobResult(jobResult *common.JobExecuteResult) {
-	scheduler.jobExecuteResultChan <- jobResult
-}

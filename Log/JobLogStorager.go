@@ -1,10 +1,11 @@
-package worker
+package Log
 
 import (
 	"context"
 	"github.com/mongodb/mongo-go-driver/mongo"
 	"github.com/mongodb/mongo-go-driver/mongo/clientopt"
 	"goDistributedCron/common"
+	"goDistributedCron/worker"
 	"time"
 )
 
@@ -47,7 +48,7 @@ func (jobLogStorager *JobLogStorager) writeJobLogLoop() {
 				logBatch = &common.JobExecuteLogBatch{}
 				// 让这个批次超时自动提交(给1秒的时间）
 				commitTimer = time.AfterFunc(
-					time.Duration(G_config.JobLogCommitTimeout)*time.Millisecond,
+					time.Duration(worker.G_config.JobLogCommitTimeout)*time.Millisecond,
 					func(batch *common.JobExecuteLogBatch) func() {
 						return func() {
 							jobLogStorager.autoCommitChan <- batch
@@ -60,7 +61,7 @@ func (jobLogStorager *JobLogStorager) writeJobLogLoop() {
 			logBatch.Logs = append(logBatch.Logs, log)
 
 			// 如果批次满了, 就立即发送
-			if len(logBatch.Logs) >= G_config.JobLogBatchSize {
+			if len(logBatch.Logs) >= worker.G_config.JobLogBatchSize {
 				// 发送日志
 				jobLogStorager.saveJobLogs(logBatch)
 				// 清空logBatch
@@ -90,8 +91,8 @@ func InitJobLogStorager() (err error) {
 	// 建立mongodb连接
 	if client, err = mongo.Connect(
 		context.TODO(),
-		G_config.MongodbUri,
-		clientopt.ConnectTimeout(time.Duration(G_config.MongodbConnectTimeOut)*time.Microsecond)); err != nil {
+		worker.G_config.MongodbUri,
+		clientopt.ConnectTimeout(time.Duration(worker.G_config.MongodbConnectTimeOut)*time.Microsecond)); err != nil {
 		return
 	}
 
