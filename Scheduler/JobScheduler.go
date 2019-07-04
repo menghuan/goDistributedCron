@@ -20,7 +20,7 @@ type JobScheduler struct {
 	jobExecuteResultChan chan *common.JobExecuteResult
 }
 
-//单例
+//单例 
 var (
 	G_scheduler *JobScheduler
 )
