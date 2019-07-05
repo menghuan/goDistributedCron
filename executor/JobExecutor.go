@@ -1,8 +1,8 @@
-package Executor
+package executor
 
 import (
-	"goDistributedCron/DistributedLock"
-	"goDistributedCron/Scheduler"
+	"goDistributedCron/distributedLock"
+	"goDistributedCron/scheduler"
 	"goDistributedCron/common"
 	"goDistributedCron/worker"
 	"math/rand"
@@ -12,6 +12,7 @@ import (
 
 //任务执行器
 type JobExecutor struct {
+
 }
 
 //单例
@@ -28,7 +29,7 @@ func (excutor *JobExecutor) ExecuteJob(planInfo *common.JobExecutingPlan) {
 			err                error
 			outPutInfo         []byte
 			result             *common.JobExecuteResult
-			jobDistributedLock *DistributedLock.JobDistributedLock
+			jobDistributedLock *distributedLock.JobDistributedLock
 		)
 
 		//拼装任务执行结果
@@ -73,7 +74,7 @@ func (excutor *JobExecutor) ExecuteJob(planInfo *common.JobExecutingPlan) {
 
 		//任务执行完成后，把执行的结果返回给Scheduler, Scheduler会从jobExcutingTableMap
 		//中删除掉执行的记录信息
-		Scheduler.G_scheduler.PushJobResult(result)
+		scheduler.G_scheduler.PushJobResult(result)
 	}()
 }
 

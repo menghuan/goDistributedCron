@@ -1,4 +1,4 @@
-package DistributedLock
+package distributedLock
 
 import (
 	"context"

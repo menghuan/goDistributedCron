@@ -1,9 +1,9 @@
-package Scheduler
+package scheduler
 
 import (
 	"fmt"
-	"goDistributedCron/Executor"
-	"goDistributedCron/Log"
+	"goDistributedCron/executor"
+	"goDistributedCron/log"
 	"goDistributedCron/common"
 	"time"
 )
@@ -87,7 +87,7 @@ func (scheduler *JobScheduler) HandleJobResult(result *common.JobExecuteResult) 
 			jobExecuteLog.Err = ""
 		}
 		//TODO: 存储日志到mongo中 需要在另一个协程中执行 不要影响schedulerCheckLoop调度任务检测
-		Log.G_jobLogStorager.AppendJobLogs(jobExecuteLog)
+		log.G_jobLogStorager.AppendJobLogs(jobExecuteLog)
 	}
 	//打印结果信息
 	fmt.Println("任务执行完成:", result.JobExecutePlanInfo.Job.Name, result.OutPut, result.Err)
@@ -117,7 +117,7 @@ func (scheduler *JobScheduler) TryStartJob(jobPlan *common.JobSchedulerPlan) {
 	fmt.Println("正在执行任务:", jobExcutingPlan.Job.Name, jobExcutingPlan.PlanExecTime, jobExcutingPlan.RealExecTime)
 
 	//开始执行任务
-	Executor.G_executor.ExecuteJob(jobExcutingPlan)
+	executor.G_executor.ExecuteJob(jobExcutingPlan)
 }
 
 //重新计算任务调度状态 jobSchedulerPlan *common.JobSchedulerPlan

@@ -3,6 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"goDistributedCron/executor"
+	"goDistributedCron/log"
+	"goDistributedCron/register"
+	"goDistributedCron/scheduler"
 	"goDistributedCron/worker"
 	"runtime"
 	"time"
@@ -44,22 +48,22 @@ func main() {
 	}
 
 	//启动服务注册发现管理器
-	if err = worker.InitJobRegister(); err != nil {
+	if err = register.InitJobRegister(); err != nil {
 		goto ERR
 	}
 
 	//启动日志协程
-	if err = worker.InitJobLogStorager(); err != nil {
+	if err = log.InitJobLogStorager(); err != nil {
 		goto ERR
 	}
 
 	//初始化任务执行器
-	if err = worker.InitJobExecutor(); err != nil {
+	if err = executor.InitJobExecutor(); err != nil {
 		goto ERR
 	}
 
 	//初始化任务调度器 会监听事件，有监听事件会从JobManager同步给Scheduler
-	if err = worker.InitJobScheduler(); err != nil {
+	if err = scheduler.InitJobScheduler(); err != nil {
 		goto ERR
 	}
 

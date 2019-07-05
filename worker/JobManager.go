@@ -4,8 +4,8 @@ import (
 	"context"
 	"github.com/coreos/etcd/clientv3"
 	"github.com/coreos/etcd/mvcc/mvccpb"
-	"goDistributedCron/DistributedLock"
-	"goDistributedCron/Scheduler"
+	"goDistributedCron/distributedLock"
+	"goDistributedCron/scheduler"
 	"goDistributedCron/common"
 	"time"
 )
@@ -91,7 +91,7 @@ func (jobMgr *JobManager) watchJob() (err error) {
 		if job, err = common.UnpackJob(kvPair.Value); err == nil {
 			jobEvent = common.BuildJobEvent(common.ETCD_JOB_EVENT_SAVE, job)
 			//TODO:	要把这个任务job同步给调度协程（scheduler）
-			Scheduler.G_scheduler.PushJobEvent(jobEvent)
+			scheduler.G_scheduler.PushJobEvent(jobEvent)
 		}
 	}
 	//2.从该revision向后监听变化的事件
@@ -120,7 +120,7 @@ func (jobMgr *JobManager) watchJob() (err error) {
 					jobEvent = common.BuildJobEvent(common.ETCD_JOB_EVENT_DELETE, job)
 				}
 				//TODO:推送事件给scheduler调度协程
-				Scheduler.G_scheduler.PushJobEvent(jobEvent)
+				scheduler.G_scheduler.PushJobEvent(jobEvent)
 			}
 		}
 	}()
@@ -153,7 +153,7 @@ func (jobMgr *JobManager) watchJobKiller() (err error) {
 					job = &common.Job{Name: jobName}
 					jobEvent = common.BuildJobEvent(common.ETCD_JOB_EVENT_KILL, job)
 					//TODO:推送事件给scheduler调度协程
-					Scheduler.G_scheduler.PushJobEvent(jobEvent)
+					scheduler.G_scheduler.PushJobEvent(jobEvent)
 				case mvccpb.DELETE: //killers标记过期，被自动删除
 				}
 			}
@@ -164,8 +164,8 @@ func (jobMgr *JobManager) watchJobKiller() (err error) {
 }
 
 //创建任务执行分布式锁
-func (jobMgr *JobManager) CreateJobDistributedLock(jobName string) (jobDistributedLock *DistributedLock.JobDistributedLock) {
+func (jobMgr *JobManager) CreateJobDistributedLock(jobName string) (jobDistributedLock *distributedLock.JobDistributedLock) {
 	//返回锁
-	jobDistributedLock = DistributedLock.InitJobDistributedLock(jobName, jobMgr.kv, jobMgr.lease)
+	jobDistributedLock = distributedLock.InitJobDistributedLock(jobName, jobMgr.kv, jobMgr.lease)
 	return
 }
