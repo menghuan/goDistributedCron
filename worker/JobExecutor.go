@@ -1,10 +1,7 @@
-package executor
+package worker
 
 import (
-	"goDistributedCron/distributedLock"
-	"goDistributedCron/scheduler"
 	"goDistributedCron/common"
-	"goDistributedCron/worker"
 	"math/rand"
 	"os/exec"
 	"time"
@@ -29,7 +26,7 @@ func (excutor *JobExecutor) ExecuteJob(planInfo *common.JobExecutingPlan) {
 			err                error
 			outPutInfo         []byte
 			result             *common.JobExecuteResult
-			jobDistributedLock *distributedLock.JobDistributedLock
+			jobDistributedLock *JobDistributedLock
 		)
 
 		//拼装任务执行结果
@@ -39,7 +36,7 @@ func (excutor *JobExecutor) ExecuteJob(planInfo *common.JobExecutingPlan) {
 		}
 
 		//先获取分布式锁 然后在执行任务
-		jobDistributedLock = worker.G_jobMgr.CreateJobDistributedLock(planInfo.Job.Name)
+		jobDistributedLock = G_jobMgr.CreateJobDistributedLock(planInfo.Job.Name)
 
 		//任务执行开始时间
 		result.StartTime = time.Now()
@@ -74,7 +71,7 @@ func (excutor *JobExecutor) ExecuteJob(planInfo *common.JobExecutingPlan) {
 
 		//任务执行完成后，把执行的结果返回给Scheduler, Scheduler会从jobExcutingTableMap
 		//中删除掉执行的记录信息
-		scheduler.G_scheduler.PushJobResult(result)
+		G_scheduler.PushJobResult(result)
 	}()
 }
 

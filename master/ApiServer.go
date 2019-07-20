@@ -4,10 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"goDistributedCron/common"
-	"net"
 	"net/http"
 	"strconv"
-	"time"
 )
 
 //任务的HTTP接口 对外是一个struct
@@ -48,7 +46,7 @@ func handleJobSave(resp http.ResponseWriter, req *http.Request) {
 	//5. 返回正常应答 ({"errno":0,"msg":"", "data":{....}})
 	if bytes, err = common.BuildResponse(0, "success", oldJob); err == nil {
 		//bytes是[]byte类型，转化成string类型便于查看
-		fmt.Println(string(bytes))
+		//fmt.Println(string(bytes))
 		resp.Write(bytes)
 	}
 	return
@@ -56,7 +54,7 @@ ERR:
 	//6. 返回异常应答
 	if bytes, err = common.BuildResponse(-1, err.Error(), nil); err == nil {
 		//bytes是[]byte类型，转化成string类型便于查看
-		fmt.Println(string(bytes))
+		//fmt.Println(string(bytes))
 		resp.Write(bytes)
 	}
 }
@@ -102,16 +100,19 @@ func handleJobList(resp http.ResponseWriter, req *http.Request) {
 
 	//获取任务列表
 	if jobList, err = G_jobMgr.ListJobs(); err != nil {
+		fmt.Println(jobList)
 		goto ERR
 	}
 
 	//正常应答
 	if bytes, err = common.BuildResponse(0, "success", jobList); err == nil {
+		//fmt.Println(string(bytes))
 		resp.Write(bytes)
 	}
 	return
 ERR:
 	if bytes, err = common.BuildResponse(-1, err.Error(), nil); err == nil {
+		//fmt.Println(string(bytes))
 		resp.Write(bytes)
 	}
 }
@@ -221,53 +222,32 @@ ERR:
 func InitApiServer() (err error) {
 	//定义初始化变量
 	var (
-		mux           *http.ServeMux
-		listener      net.Listener
-		httpServer    *http.Server
 		staticDir     http.Dir     //静态文件根目录
 		staticHandler http.Handler //静态文件的HTTP回调
 	)
-	//配置路由
-	mux = http.NewServeMux()
+
 	//保存任务
-	mux.HandleFunc("/job/save", handleJobSave)
+	http.HandleFunc("/job/save", handleJobSave)
 	//删除任务
-	mux.HandleFunc("/job/delete", handleJobDelete)
+	http.HandleFunc("/job/delete", handleJobDelete)
 	//获取任务列表
-	mux.HandleFunc("/job/list", handleJobList)
+	http.HandleFunc("/job/list", handleJobList)
 	//杀死任务
-	mux.HandleFunc("/job/kill", handleJobKill)
+	http.HandleFunc("/job/kill", handleJobKill)
 	//查询日志
-	mux.HandleFunc("/job/log", handleJobLog)
+	http.HandleFunc("/job/log", handleJobLog)
 	//worker节点监听
-	mux.HandleFunc("/worker/list", handleWorkerList)
+	http.HandleFunc("/worker/list", handleWorkerList)
 
 	//静态文件目录
 	staticDir = http.Dir(G_config.StaticWebRoot)
 	//静态文件handler
 	staticHandler = http.FileServer(staticDir)
 	// /index.html   ./static_webroot/index.html
-	mux.Handle("/", http.StripPrefix("/", staticHandler))
-
-	//启动TCP监听 此处err不定义局部变量 直接返回值返回
-	if listener, err = net.Listen("tcp", ":"+strconv.Itoa(G_config.ApiPort)); err != nil {
-		return
-	}
-
-	//创建一个http服务
-	httpServer = &http.Server{
-		ReadTimeout:  time.Duration(G_config.ApiReadTimeout),
-		WriteTimeout: time.Duration(G_config.ApiWriteTimeout),
-		Handler:      mux,
-	}
-
-	//赋值单例
-	G_apiServer = &ApiServer{
-		httpServer: httpServer,
-	}
+	http.Handle("/", http.StripPrefix("/", staticHandler))
 
 	//启动服务端
-	go httpServer.Serve(listener)
+	go http.ListenAndServe(":"+strconv.Itoa(G_config.ApiPort), nil)
 
 	return
 }

@@ -1,10 +1,9 @@
-package register
+package worker
 
 import (
 	"context"
 	"github.com/coreos/etcd/clientv3"
 	"goDistributedCron/common"
-	"goDistributedCron/worker"
 	"net"
 	"time"
 )
@@ -115,8 +114,8 @@ func InitJobRegister() (err error) {
 
 	// 初始化配置
 	config = clientv3.Config{
-		Endpoints:   worker.G_config.EtcdEndpoints,                                     // 集群地址
-		DialTimeout: time.Duration(worker.G_config.EtcdDialTimeout) * time.Millisecond, // 连接超时
+		Endpoints:   G_config.EtcdEndpoints,                                     // 集群地址
+		DialTimeout: time.Duration(G_config.EtcdDialTimeout) * time.Millisecond, // 连接超时
 	}
 
 	// 建立连接
