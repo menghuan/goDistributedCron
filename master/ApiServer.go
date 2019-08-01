@@ -243,7 +243,7 @@ func InitApiServer() (err error) {
 	staticDir = http.Dir(G_config.StaticWebRoot)
 	//静态文件handler
 	staticHandler = http.FileServer(staticDir)
-	// /index.html   ./static_webroot/index.html
+	// /index.html   ./static_webroot/static/_webroot/index.html
 	http.Handle("/", http.StripPrefix("/", staticHandler))
 
 	//启动服务端
