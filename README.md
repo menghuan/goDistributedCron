@@ -23,14 +23,14 @@
     需要通过 https://github.com/menghuan/go-distributed-cron-fronted vue后台管理项目进行打包生成后 
     放到本项目根目录的web目录下 
     打包流程：
-        install dependency
-        npm install  /  npm install --unsafe-perm
+      install dependency
+      npm install  /  npm install --unsafe-perm
 	
-        build for test environment
-	npm run build:stage
+      build for test environment
+      npm run build:stage
 
-        build for production environment
-	npm run build:prod
+      build for production environment
+      npm run build:prod
     
     
   ##todo 后期会迭代加入微服务设计 注册发现，负载均衡，链路追踪，日志收集，监控报警等等
