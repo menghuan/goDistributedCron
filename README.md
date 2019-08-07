@@ -20,7 +20,7 @@
     5. 把执行的日志保存到存储中
     
   ## vue页面管理
-    需要通过 [https://github.com/menghuan/go-distributed-cron-fronted](https://github.com/menghuan/go-distributed-cron-fronted) 
+    需要通过  https://github.com/menghuan/go-distributed-cron-fronted
     vue后台管理项目进行打包生成后 放到本项目根目录的web目录下 
     打包流程：
       install dependency
