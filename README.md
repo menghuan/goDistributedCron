@@ -20,7 +20,8 @@
     5. 把执行的日志保存到存储中(目前基于mongo 后期会改成es)
     
   ## vue管理后台
-    需要通过  [分布式任务调度系统管理平台](https://github.com/menghuan/go-distributed-cron-fronted)
+    需要通过  
+    [分布式任务调度系统管理平台](https://github.com/menghuan/go-distributed-cron-fronted)
     vue后台管理项目进行打包生成后 放到本项目根目录的web目录下 
     打包流程：
       install dependency
