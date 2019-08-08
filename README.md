@@ -1,6 +1,17 @@
 # goDistributedCron
 一款简单的分布式任务调度系统，有vue管理后台可以操作
 
+# go-distributed-cron-fronted
+
+English | [简体中文](./README-zh.md)
+
+> A minimal vue admin with Element UI & axios & iconfont & permission control & lint
+
+基于vue-admin-template 进行修改的
+
+**vue-admin-template Live demo:** http://panjiachen.github.io/vue-admin-template
+
+
 # 后续会持续完善跟进
   ## master  任务的管理以及一个后台操作管理
     主程序初始化相关操作
