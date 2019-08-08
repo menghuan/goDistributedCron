@@ -1,9 +1,7 @@
 # goDistributedCron
 一款简单的分布式任务调度系统，有vue管理后台可以操作
 
-[分布式任务调度系统管理平台](https://github.com/menghuan/go-distributed-cron-fronted)
-
-# 后续会持续完善跟进
+# 目前完成以下内容,后续会持续完善跟进
   ## master  任务的管理以及一个后台操作管理
     主程序初始化相关操作
     1. 线程数设置
@@ -21,9 +19,9 @@
     4. 实现分布式锁，解决并发惊群调度问题
     5. 把执行的日志保存到存储中(目前基于mongo 后期会改成es)
     
-  ## vue管理后台
-    需要通过  
-   
+    
+# vue管理后台
+    需要通过 [分布式任务调度系统管理平台](https://github.com/menghuan/go-distributed-cron-fronted)
     vue后台管理项目进行打包生成后 放到本项目根目录的web目录下 
     打包流程：
       install dependency
