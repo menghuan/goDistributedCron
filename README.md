@@ -21,9 +21,9 @@
     
     
 # vue管理后台
-    需要通过 [分布式任务调度系统管理平台](https://github.com/menghuan/go-distributed-cron-fronted)
-    vue后台管理项目进行打包生成后 放到本项目根目录的web目录下 
-    打包流程：
+  需要通过 [分布式任务调度系统管理平台](https://github.com/menghuan/go-distributed-cron-fronted)
+  vue后台管理项目进行打包生成后 放到本项目根目录的web目录下 
+  打包流程：
       install dependency
       npm install  /  npm install --unsafe-perm
 	
