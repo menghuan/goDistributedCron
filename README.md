@@ -39,4 +39,16 @@
 	
 	
 # 系统简单架构图如下:
-   <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/go_cron_arch.png" width="800px"></p>
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/go_cron_arch.png" width="800px"></p>
+
+# 管理后台图如下:
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/login.png" width="800px"></p>
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/index.png" width="800px"></p>
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/job_add_edit.png" width="800px"></p>
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/job_list.png" width="800px"></p>
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/job_log.png" width="800px"></p>
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/work_list_vue.png" width="800px"></p>
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/etcd_job_watch.png" width="800px"></p>
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/worker_run.png" width="800px"></p>
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/job_lock.png" width="800px"></p>
+  <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/work_list.png" width="800px"></p>
