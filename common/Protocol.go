@@ -16,6 +16,8 @@ type Job struct {
 	Command   string `json:"command"`
 	//cron表达式
 	CronExpr  string `json:"cronExpr"`
+	//任务备注
+	Remark  string `json:"remark"`
 }
 
 //etcd任务调度计划
