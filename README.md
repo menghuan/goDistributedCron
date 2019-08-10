@@ -41,7 +41,7 @@
 # 系统简单架构图如下:
   <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/go_cron_arch.png" width="800px"></p>
 
-# 管理后台图如下:
+# vue管理后台图如下:
   <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/login.png" width="800px"></p>
   <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/index.png" width="800px"></p>
   <p align="center"><img src="https://github.com/menghuan/goDistributedCron/blob/master/docs/job_add_edit.png" width="800px"></p>
